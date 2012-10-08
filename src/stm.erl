@@ -7,17 +7,19 @@
 %%%=============================================================================
 
 %%%_* Module declaration =======================================================
--module(STM).
+-module(stm).
 
 %%%_* Exports ==================================================================
--export([ transaction/1
+-export([ atomic/1
         ]).
 
 %%%_* Includes =================================================================
-%-include("").
+-include("include/stm.hrl").
 
 %%%_* Constants definition =====================================================
--define(STM_TRANSACTION_ID, stm_transaction_id).
+
+%%%_* Types definition =========================================================
+-type stm() :: integer().
 
 %%%_* Code =====================================================================
 
@@ -25,11 +27,14 @@
 %% Function: transaction(Fun) -> _
 %%------------------------------------------------------------------------------
 
-transaction(Fun) ->
-    % Execute Fun in a transactional context
-    case get(?STM_key) of
+atomic(Fun) ->
+    %% Execute Fun in a transactional context
+    case get(?STM_TRANSACTION_ID) of
         undefined -> % No transaction has been started yet
             create_transaction();
-        CurrentTransaction -> 
+        CurrentTransaction -> % There's already a transaction running.
+            Fun()
+    end.
             
 
+%% -*- erlang-indent-level: 2 -*-
