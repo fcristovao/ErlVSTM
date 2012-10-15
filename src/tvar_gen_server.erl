@@ -2,13 +2,13 @@
 %%%=============================================================================
 %%% @doc Main file for the TVar operations
 %%%
-%%% @copyright 2012 Filipe Cristóvão
+%%% @copyright 2012 Filipe CristÃ³vÃ£o
 %%%
 %%% @end
 %%%=============================================================================
 
 %%%_* Module declaration =======================================================
--module(tvar).
+-module(tvar_gen_server).
 -behavior(gen_server).
 
 %%%_* Exports ==================================================================
@@ -34,12 +34,22 @@
 
 %%%_* Code =====================================================================
 
-%%------------------------------------------------------------------------------
-%% Function: new
-%% Creates a new Transactional Variable
-%%------------------------------------------------------------------------------
--spec new() -> tvar().
-new(InitialValue) ->
-  {ok, Pid} = gen_server:start(tvar,[InitialValue],[]),
-  #tvar{pid = Pid}.
 
+init([InitialValue]) ->
+  FirstBody = #vBoxBody{version = 0,
+                        value = InitialValue},
+  {ok, [FirstBody]}.
+
+
+read() ->
+  CurrentTransaction = getCurrentOrCreateTransaction()
+
+
+getCurrentOrCreateTransaction(Readonly = false) ->
+  CurrentTransaction = stm:get_current_transaction(),
+  case CurrentTransaction of
+    none ->
+      transaction:new(Readonly);
+    Transaction ->
+      Transaction
+  end.
