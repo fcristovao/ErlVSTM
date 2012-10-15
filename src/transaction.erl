@@ -31,17 +31,17 @@
 
 new(TxNumber) ->
   {ok, Pid} = gen_server:start(transaction_gen_server,TxNumber,[]),
-  TxNr = gen_server:call(Pid, getTxNr),
+  TxNr = gen_server:call(Pid, getTransactionNumber),
   new(TxNr, Pid).
 
 getTVarValue(Transaction, TVar) ->
-  gen_server:call(pid(Transaction), {getTVarValue, TVar}).
+  gen_server:call(pid(Transaction), {getTVarValue, Transaction, TVar}).
     
 new(TxNumber, Pid) ->
   #txObject{txNumber = TxNumber, pid = Pid}.
 
-pid(TxObject) ->
+pid(Transaction) ->
   TxObject#txObject.pid
 
-txNumber(TxObject) ->
+txNumber(Transaction) ->
   TxObject#txObject.txNumber  
