@@ -10,6 +10,6 @@
 -define(_STM_HRL_,true).
 
 %%%_* Constants definition =====================================================
--define(STM_TRANSACTION_ID, stm_transaction_id).
+
 
 -endif.

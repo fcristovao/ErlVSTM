@@ -1,6 +1,6 @@
-%%% -*- erlang-indent-level: 2 -*-
+%% -*- erlang-indent-level: 2 -*-
 %%%=============================================================================
-%%% @doc Main file for the TVar operations
+%%% @doc Transactions
 %%%
 %%% @copyright 2012 Filipe Cristóvão
 %%%
@@ -8,46 +8,24 @@
 %%%=============================================================================
 
 %%%_* Module declaration =======================================================
--module(tvar).
--behavior(gen_server).
+-module(transaction).
 
 %%%_* Exports ==================================================================
--export([ new/0
+-export([
         ]).
 
 %%%_* Includes =================================================================
--include("include/stm.hrl").
+
 
 %%%_* Constants definition =====================================================
 
-
 %%%_* Types definition =========================================================
-%%-type tvar() :: integer().
 
--record(tvar, {pid :: pid()
-              }).
-
--record(vBox, {vBoxBodies :: list(vBoxBody())}).
-
--record(vBoxBody, {version = 0 :: non_neg_integer(),
-                   value       :: any()}).
-                
 %%%_* Code =====================================================================
 
 %%------------------------------------------------------------------------------
-%% Function: new
-%% Creates a new Transactional Variable
+%% Function: transaction(Fun) -> _
 %%------------------------------------------------------------------------------
--spec new() -> tvar().
-new(InitialValue) ->
-  {ok, Pid} = gen_server:start(tvar,[InitialValue],[]),
-  #tvar{pid = Pid}.
 
-init([InitialValue]) ->
-  #vBoxBody{version = 0,
-            value = InitialValue
-          
-          
-          
-
-              
+new() ->
+    
