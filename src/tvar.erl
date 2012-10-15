@@ -31,7 +31,7 @@
 
 -record(vBoxBody, {version = 0 :: non_neg_integer(),
                    value       :: any()}).
-                
+
 %%%_* Code =====================================================================
 
 %%------------------------------------------------------------------------------
@@ -44,10 +44,20 @@ new(InitialValue) ->
   #tvar{pid = Pid}.
 
 init([InitialValue]) ->
-  #vBoxBody{version = 0,
-            value = InitialValue
-          
-          
-          
+  FirstBody = #vBoxBody{version = 0,
+                        value = InitialValue},
+  {ok, [FirstBody]}.
 
-              
+
+read() ->
+  CurrentTransaction = getCurrentOrCreateTransaction()
+
+
+getCurrentOrCreateTransaction(Readonly = false) ->
+  CurrentTransaction = stm:get_current_transaction(),
+  case CurrentTransaction of
+    none ->
+      transaction:new(Readonly);
+    Transaction ->
+      Transaction
+  end.
