@@ -2,7 +2,7 @@
 %%%=============================================================================
 %%% @doc Main file for the TVar operations
 %%%
-%%% @copyright 2012 Filipe CristÃ³vÃ£o
+%%% @copyright 2012 Filipe Cristóvão
 %%%
 %%% @end
 %%%=============================================================================
@@ -12,44 +12,40 @@
 -behavior(gen_server).
 
 %%%_* Exports ==================================================================
--export([ new/0
-        ]).
+-compile(export_all).
 
 %%%_* Includes =================================================================
--include("include/stm.hrl").
+
 
 %%%_* Constants definition =====================================================
 
 
 %%%_* Types definition =========================================================
-%%-type tvar() :: integer().
 
--record(tvar, {pid :: pid()
-              }).
-
--record(vBox, {vBoxBodies :: list(vBoxBody())}).
-
--record(vBoxBody, {version = 0 :: non_neg_integer(),
-                   value       :: any()}).
 
 %%%_* Code =====================================================================
 
 
-init([InitialValue]) ->
-  FirstBody = #vBoxBody{version = 0,
-                        value = InitialValue},
-  {ok, [FirstBody]}.
+init(InitialValue) ->
+  {ok, vbox:new(InitialValue)}.
 
+handle_call({get, TVar, Transaction}, _From, _VBox) ->
+  Result = get(TVar, Transaction),
+  {reply, Result, _VBox};
 
-read() ->
-  CurrentTransaction = getCurrentOrCreateTransaction()
+handle_call({set, TVar, Transaction, NewValue}, _From, _VBox) ->
+  Result = set(TVar, Transaction, NewValue),
+  {reply, Result, _VBox};
 
+handle_call({getBody, _TVar, Transaction}, _From, VBox) ->
+  Result = getBody(VBox, Transaction),
+  {reply, Result, VBox}.
 
-getCurrentOrCreateTransaction(Readonly = false) ->
-  CurrentTransaction = stm:get_current_transaction(),
-  case CurrentTransaction of
-    none ->
-      transaction:new(Readonly);
-    Transaction ->
-      Transaction
-  end.
+get(TVar, Transaction) ->
+  transaction:getTVarValue(Transaction, TVar).
+
+set(TVar, Transaction, NewValue) ->
+  transaction:setTVarValue(Transaction, TVar, NewValue).
+
+getBody(VBox, Transaction) ->
+  vbox:get(VBox, transaction:txNumber(Transaction)).

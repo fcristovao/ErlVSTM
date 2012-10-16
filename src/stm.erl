@@ -30,19 +30,28 @@
 %%------------------------------------------------------------------------------
 
 atomic(Fun) ->
-    %% Execute Fun in a transactional context
-    case get_current_transaction() of
-        none -> % No transaction has been started yet
-            create_transaction();
-        CurrentTransaction -> % There's already a transaction running.
-            Fun()
-    end.
+  %% Execute Fun in a transactional context
+  case get_current_transaction() of
+    none -> % No transaction has been started yet
+      NewTransaction = create_transaction(),
+      set_current_transaction(NewTransaction),
 
+    CurrentTransaction -> % There's already a transaction running.
+      
+  end,
+  Fun().
+
+
+create_transaction() ->
+  transaction:new(1).
 
 get_current_transaction() ->
-    case get(?STM_TRANSACTION_KEY) of
-        undefined -> % No transaction has been started yet
-            none;
-        CurrentTransaction ->
-            CurrentTransaction
-    end.
+  case get(?STM_TRANSACTION_KEY) of
+    undefined -> % No transaction has been started yet
+      none;
+    CurrentTransaction ->
+      CurrentTransaction
+  end.
+
+set_current_transaction(Transaction) ->
+  put(?STM_TRANSACTION_KEY, Transaction).

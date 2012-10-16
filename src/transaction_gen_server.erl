@@ -9,6 +9,7 @@
 
 %%%_* Module declaration =======================================================
 -module(transaction_gen_server).
+-behavior(gen_server).
 
 %%%_* Exports ==================================================================
 -export([
@@ -21,8 +22,6 @@
 -define(TRANSACTION_NUMBER, transaction_number).
 
 %%%_* Types definition =========================================================
-
-
 
 -record(state, {readSet,
                 writeSet
@@ -54,7 +53,7 @@ getTransactionNumber() ->
 getTVarValue(State, Transaction, TVar) ->
   Result =
     case getLocalTVarValue(TVar) of 
-      none -> tvar:get(TVar, Transaction);
+      none -> tvar:getBody(TVar, Transaction);
       {ok, Value} -> Value
     end.
   {addToReadSet(State, TVar), Result}

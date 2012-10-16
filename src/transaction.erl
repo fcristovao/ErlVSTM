@@ -40,8 +40,10 @@ getTVarValue(Transaction, TVar) ->
 new(TxNumber, Pid) ->
   #txObject{txNumber = TxNumber, pid = Pid}.
 
-pid(Transaction) ->
-  TxObject#txObject.pid
+pid(#txObject{pid = Pid}) -> Pid.
 
-txNumber(Transaction) ->
-  TxObject#txObject.txNumber  
+txNumber(#txObject{txNumber = TxNumber}) -> TxNumber.
+
+isTransaction(AnyObject) ->
+  is_record(AnyObject, txObject).
+
