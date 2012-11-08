@@ -1,4 +1,3 @@
-%%% -*- erlang-indent-level: 2 -*-
 %%%=============================================================================
 %%% @doc Main file for the VBoxBodies
 %%% @copyright 2012 Filipe Cristóvão
@@ -42,4 +41,8 @@ is_vbox_body(#vbox_body{}) ->
 is_vbox_body(_AnythingElse) ->
   false.
 
-
+%%%_* Emacs ====================================================================
+%%% Local Variables:
+%%% allout-layout: t
+%%% erlang-indent-level: 2
+%%% End:
