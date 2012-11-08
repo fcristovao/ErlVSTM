@@ -11,7 +11,7 @@
 %%%_* Exports ==================================================================
 -export([ new/1
         ]).
--compile(export_all).
+
 %%%_* Includes =================================================================
 
 %%%_* Constants definition =====================================================
@@ -27,18 +27,18 @@
 %% Function: new
 %% Creates a new Transactional Variable
 %%------------------------------------------------------------------------------
-%-spec new() -> vBox().
+%%-spec new() -> vBox().
 new(InitialValue) ->
   VBoxBody = vboxbody:new(InitialValue),
   #vBox{vBoxBodies = [VBoxBody]}.
 
 put(VBox, Transaction, NewValue) ->
-	NewVBoxBody = vboxbody:new(transaction:txNumber(Transaction), NewValue),
+  NewVBoxBody = vboxbody:new(transaction:txNumber(Transaction), NewValue),
   #vBox{vBoxBodies = [NewVBoxBody | vBoxBodies(VBox)]}.
 
 get(VBox, VersionNr) ->
   Pred = fun(VBoxBody) ->
-           vboxbody:version(VBoxBody) > VersionNr
+             vboxbody:version(VBoxBody) > VersionNr
          end,
   VBoxBody = first(Pred,vBoxBodies(VBox)),
   vboxbody:value(VBoxBody).
@@ -46,8 +46,16 @@ get(VBox, VersionNr) ->
 
 vBoxBodies(#vBox{vBoxBodies = VBoxBodies}) -> VBoxBodies.
 
-% util:
-first(Pred, []) when is_function(Pred) -> throw(not_possible);
-first(Pred, List) when is_function(Pred), is_list(List) ->
-  [Head | _ ] = lists:dropwhile(Pred, List),
-  Head.
+addVBoxBody(VBox#vBox{vBoxBodies = VBoxBodies}, NewVBoxBody) ->
+  %% TODO: There should be some sort of verification that indeed it is
+  %% a VBoxBody being sent.
+  NewVBoxBody
+  
+
+
+
+%%%_* Emacs ====================================================================
+%%% Local Variables:
+%%% allout-layout: t
+%%% erlang-indent-level: 2
+%%% End:
