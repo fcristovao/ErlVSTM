@@ -1,6 +1,11 @@
-.eunit
-deps
-priv
-*.o
+*~
 *.beam
-*.plt
+*.app
+doc/*.html
+doc/edoc-info
+doc/erlang.png
+doc/*.css
+deps
+.eunit/
+doc/design/*.eps
+rebar/*

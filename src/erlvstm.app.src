@@ -1,0 +1,19 @@
+{application, erlvstm,
+ [
+  {description, "A Erlang implementation of the JVSTM"},
+  {vsn, "git"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, {erlvstm_app, []}},
+  {env, []}
+ ]}.
+
+%%%_* Emacs ====================================================================
+%%% Local Variables:
+%%% mode: erlang
+%%% allout-layout: t
+%%% erlang-indent-level: 2
+%%% End:
