@@ -1,5 +1,5 @@
 %%%=============================================================================
-%%% @doc Main file for the VBoxBodies
+%%% @doc Main file for the VBox Bodies
 %%% @copyright 2012 Filipe Cristóvão
 %%% @end
 %%%=============================================================================
@@ -8,9 +8,13 @@
 -module(vbox_body).
 
 %%%_* Exports ==================================================================
--export([ new/2
+-export([ new/1
+        , new/2
+        , version/1
+        , value/1
+        , is_vbox_body/1
         ]).
--compile(export_all).
+
 %%%_* Includes =================================================================
 
 
@@ -22,20 +26,28 @@
 -record(vbox_body, {version = 0 :: non_neg_integer(),
                     value       :: any()}).
 
+-opaque vbox_body() :: #vbox_body{}.
+
 %%%_* Code =====================================================================
+
+-spec new(any()) -> vbox_body().
 new(InitialValue) ->
   new(0, InitialValue).
 
+-spec new(Version :: non_neg_integer(), Value :: any()) -> vbox_body().
 new(Version, Value) ->
   #vbox_body{version = Version,
              value   = Value}.
 
+-spec version(vbox_body()) -> non_neg_integer().
 version(#vbox_body{version = Version}) ->
   Version.
 
+-spec value(vbox_body()) -> any().
 value(#vbox_body{value = Value}) ->
   Value.
 
+-spec is_vbox_body(any()) -> boolean().
 is_vbox_body(#vbox_body{}) ->
   true;
 is_vbox_body(_AnythingElse) ->
