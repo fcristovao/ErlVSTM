@@ -1,9 +1,6 @@
-%% -*- erlang-indent-level: 2 -*-
 %%%=============================================================================
 %%% @doc Transactions Gen Server
-%%%
-%%% @copyright 2012 Filipe Cristóvão
-%%%
+%%% @copyright 2012 Filipe Cristovao
 %%% @end
 %%%=============================================================================
 
@@ -12,20 +9,27 @@
 -behavior(gen_server).
 
 %%%_* Exports ==================================================================
--export([
+-export([ init/1
+        , handle_call/3
+%        , handle_info/2
         ]).
 
 %%%_* Includes =================================================================
 
+-include_lib("transaction_gen_server_messages.hrl").
 
 %%%_* Constants definition =====================================================
--define(TRANSACTION_NUMBER, transaction_number).
+%-define(TRANSACTION_NUMBER, transaction_number).
 
 %%%_* Types definition =========================================================
 
--record(state, {readSet,
-                writeSet
-              }).
+-record(state, { tx_number :: integer()
+               , readset
+               , writeset
+               }).
+
+-type state() :: #state{}.
+-type tvar()  :: tvar:tvar().
 
 %%%_* Code =====================================================================
 
@@ -34,55 +38,61 @@
 %%------------------------------------------------------------------------------
 
 init(TxNumber) ->
-  undefined = put(?TRANSACTION_NUMBER, TxNumber),
-  {ok, newState()}.
+  {ok, newState(TxNumber)}.
 
-handle_call({getTransationNumber}, _From, _State) ->
-  Result = getTransactionNumber(),
-  {reply, Result, _State}
+handle_call({?getTransactionNumber}, _From, State) ->
+  {reply, tx_number(State), State};
 
-handle_call({getTVarValue, Transaction, TVar}, _From, State) ->
-  {NewState, Result} = getTVarValue(State, Transaction, TVar),
-  {reply, Result, NewState}
+handle_call({?getTVarValue, Transaction, TVar}, _From, State) ->
+  {NewState, Result} = get_tvar_value(State, Transaction, TVar),
+  {reply, Result, NewState}.
 
 
-getTransactionNumber() ->
-  get(?TRANSACTION_NUMBER).
-  
-
-getTVarValue(State, Transaction, TVar) ->
+get_tvar_value(State, Transaction, TVar) ->
   Result =
-    case getLocalTVarValue(TVar) of 
-      none -> tvar:getBody(TVar, Transaction);
+    case get_local_tvar_value(State, TVar) of
+      none -> tvar:get_body(TVar, Transaction);
       {ok, Value} -> Value
-    end.
-  {addToReadSet(State, TVar), Result}
+    end,
+  {add_to_readset(State, TVar), Result}.
 
 
--spec getLocalTVarValue(state(), tvar()) -> {ok, any()} | none
-getLocalTVarValue(State, TVar) ->
-  case dict:find(TVar, writeSet(State)) of 
+-spec get_local_tvar_value(state(), tvar()) -> {ok, any()} | none.
+get_local_tvar_value(State, TVar) ->
+  case dict:find(TVar, writeset(State)) of
     error -> none;
     AnythingElse -> AnythingElse
   end.
 
 
-addToReadSet(State, TVar) ->
-  NewReadSet = dict:append(TVar,true,readSet(State)),
-  setReadSet(State, NewReadSet).
+%%%_* Internal functions -------------------------------------------------------
 
-newState() ->
-  #state{ readSet  = dict:new(),
-          writeSet = dict:new()}.
+newState(TxNumber) ->
+  #state{ tx_number = TxNumber,
+          readset   = dict:new(),
+          writeset  = dict:new()
+        }.
 
-readSet(#state{readSet = ReadSet}) -> ReadSet.
+tx_number(#state{tx_number = TxNumber}) -> TxNumber.
 
-setReadSet(State = #state{}, NewReadSet) ->
-  State#state{readSet = NewReadSet}.
+readset(#state{readset = Readset}) -> Readset.
 
-writeSet(#state{writeSet = WriteSet}) -> WriteSet.
-
-setWriteSet(State = #state{}, NewWriteSet) ->
-  State#state{writeSet = NewWriteSet}.
+set_readset(State = #state{}, NewReadset) ->
+  State#state{readset = NewReadset}.
 
 
+add_to_readset(State, TVar) ->
+  NewReadSet = dict:append(TVar, true, readset(State)),
+  set_readset(State, NewReadSet).
+
+writeset(#state{writeset = Writeset}) -> Writeset.
+
+set_writeset(State = #state{}, NewWriteset) ->
+  State#state{writeset = NewWriteset}.
+
+
+%%%_* Emacs ====================================================================
+%%% Local Variables:
+%%% allout-layout: t
+%%% erlang-indent-level: 2
+%%% End:

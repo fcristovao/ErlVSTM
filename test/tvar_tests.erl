@@ -1,18 +1,19 @@
-%% -*- erlang-indent-level: 2 -*-
 %%%=============================================================================
-%%% @doc STM tests
-%%% @copyright 2012 Filipe Cristóvão
+%%% @doc TVar tests
+%%% @copyright 2012 Filipe Cristovao
 %%% @end
 %%%=============================================================================
 
 %%%_* Module declaration =======================================================
--module(stm_tests).
+-module(tvar_tests).
 
 %%%_* Exports ==================================================================
--compile(export_all).
 
 %%%_* Includes =================================================================
-%-include("src/transaction.erl").
+
+-include_lib("proper/include/proper.hrl").
+-include_lib("eunit/include/eunit.hrl").
+-include_lib("proper_utility.hrl").
 
 %%%_* Constants definition =====================================================
 
@@ -20,14 +21,26 @@
 
 %%%_* Code =====================================================================
 
-simple_test() ->
-  TInt = tvar:new(0),
-  TBool = tvar:new(false),
-  TList = tvar:new([]).
+%% creation_test() ->
+%%   tvar:new(0).
 
+%% different_types_test() ->
+%%   _TInt  = tvar:new(0),
+%%   _TBool = tvar:new(false),
+%%   _TList = tvar:new([]).
 
+property_test_() ->
+  ?runProperTestsInEUnit.
 
-  %tvar:set(TInt, 1).
+prop_creation_works_with_any_type() ->
+  ?FORALL(Value,
+          any(),
+          try tvar:new(Value) of
+              _ -> true
+          catch
+            _ -> false
+          end
+         ).
 
 %%%_* Emacs ====================================================================
 %%% Local Variables:

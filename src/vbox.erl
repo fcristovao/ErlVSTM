@@ -1,14 +1,15 @@
-%%% -*- erlang-indent-level: 2 -*-
 %%%=============================================================================
 %%% @doc Main file for the VBoxes
-%%% @copyright 2012 Filipe Cristóvão
+%%% @copyright 2012 Filipe Cristovao
 %%% @end
 %%%=============================================================================
 
 %%%_* Module declaration =======================================================
+
 -module(vbox).
 
 %%%_* Exports ==================================================================
+
 -export([ new/1
         ]).
 
@@ -18,40 +19,40 @@
 
 %%%_* Types definition =========================================================
 
--record(vBox, {vBoxBodies}).
+-type vbox_body() :: vbox_body:vbox_body().
 
+-record(vbox, { vbox_bodies :: list(vbox_body())
+              }).
+
+-opaque vbox() :: #vbox{}.
+
+-export_type([vbox/0]).
 
 %%%_* Code =====================================================================
 
-%%------------------------------------------------------------------------------
-%% Function: new
-%% Creates a new Transactional Variable
-%%------------------------------------------------------------------------------
-%%-spec new() -> vBox().
+-spec new(InitialValue :: any()) -> vbox().
 new(InitialValue) ->
-  VBoxBody = vboxbody:new(InitialValue),
-  #vBox{vBoxBodies = [VBoxBody]}.
+  VBoxBody = vbox_body:new(InitialValue),
+  #vbox{vbox_bodies = [VBoxBody]}.
 
 put(VBox, Transaction, NewValue) ->
-  NewVBoxBody = vboxbody:new(transaction:txNumber(Transaction), NewValue),
-  #vBox{vBoxBodies = [NewVBoxBody | vBoxBodies(VBox)]}.
+  NewVBoxBody = vbox_body:new(transaction:tx_number(Transaction), NewValue),
+  #vbox{vbox_bodies = [NewVBoxBody | vbox_bodies(VBox)]}.
 
 get(VBox, VersionNr) ->
   Pred = fun(VBoxBody) ->
-             vboxbody:version(VBoxBody) > VersionNr
+             vbox_body:version(VBoxBody) > VersionNr
          end,
-  VBoxBody = first(Pred,vBoxBodies(VBox)),
-  vboxbody:value(VBoxBody).
+  VBoxBody = utilities:first(Pred, vbox_bodies(VBox)),
+  vbox_body:value(VBoxBody).
 
 
-vBoxBodies(#vBox{vBoxBodies = VBoxBodies}) -> VBoxBodies.
+vbox_bodies(#vbox{vbox_bodies = VBoxBodies}) -> VBoxBodies.
 
-addVBoxBody(VBox#vBox{vBoxBodies = VBoxBodies}, NewVBoxBody) ->
+add_vbox_body(VBox = #vbox{vbox_bodies = VBoxBodies}, NewVBoxBody) ->
   %% TODO: There should be some sort of verification that indeed it is
   %% a VBoxBody being sent.
-  NewVBoxBody
-  
-
+  VBox.
 
 
 %%%_* Emacs ====================================================================

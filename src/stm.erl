@@ -1,9 +1,6 @@
-%% -*- erlang-indent-level: 2 -*-
 %%%=============================================================================
 %%% @doc Main file for the STM operations
-%%%
-%%% @copyright 2012 Filipe Cristóvão
-%%%
+%%% @copyright 2012 Filipe Cristovao
 %%% @end
 %%%=============================================================================
 
@@ -12,6 +9,8 @@
 
 %%%_* Exports ==================================================================
 -export([ atomic/1
+        , create_transaction/0
+        , get_current_transaction/0
         ]).
 
 %%%_* Includes =================================================================
@@ -21,7 +20,6 @@
 -define(STM_TRANSACTION_KEY, stm_transaction_key).
 
 %%%_* Types definition =========================================================
--type stm() :: integer().
 
 %%%_* Code =====================================================================
 
@@ -35,9 +33,9 @@ atomic(Fun) ->
     none -> % No transaction has been started yet
       NewTransaction = create_transaction(),
       set_current_transaction(NewTransaction),
-
-    CurrentTransaction -> % There's already a transaction running.
-      
+      true;
+    _CurrentTransaction -> % There's already a transaction running.
+      true
   end,
   Fun().
 
@@ -55,3 +53,9 @@ get_current_transaction() ->
 
 set_current_transaction(Transaction) ->
   put(?STM_TRANSACTION_KEY, Transaction).
+
+%%%_* Emacs ====================================================================
+%%% Local Variables:
+%%% allout-layout: t
+%%% erlang-indent-level: 2
+%%% End:
