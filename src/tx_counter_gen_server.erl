@@ -1,11 +1,11 @@
 %%%=============================================================================
-%%% @doc Main file for the TVar operations
-%%% @copyright 2012 Filipe Cristovao
+%%% @doc Transactions Counter
+%%% @copyright 2012 Filipe Cristóvão
 %%% @end
 %%%=============================================================================
 
 %%%_* Module declaration =======================================================
--module(tvar_gen_server).
+-module(tx_counter_gen_server).
 -behavior(gen_server).
 
 %%%_* Exports ==================================================================
@@ -19,34 +19,35 @@
         , code_change/3
         ]).
 
+-export([ start_link/0
+        ]).
+
 %%%_* Includes =================================================================
 
--include_lib("tvar_gen_server_messages.hrl").
+-include_lib("tx_counter_gen_server_messages.hrl").
 
 %%%_* Constants definition =====================================================
 
-
 %%%_* Types definition =========================================================
-
 
 %%%_* Code =====================================================================
 
+start_link() ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, no_arguments, []).
+
 %%%_* Gen Server Interface -----------------------------------------------------
 
-init(InitialValue) ->
-  {ok, vbox:new(InitialValue)}.
+init(no_arguments) ->
+  {ok, 0}.
 
-handle_call({?get, TVar, Transaction}, _From, _VBox) ->
-  Result = get(TVar, Transaction),
-  {reply, Result, _VBox};
+handle_call({?get}, _From, CurrentValue) ->
+  {reply, CurrentValue, CurrentValue};
 
-handle_call({?set, TVar, Transaction, NewValue}, _From, _VBox) ->
-  Result = set(TVar, Transaction, NewValue),
-  {reply, Result, _VBox};
+handle_call({?get_and_increment}, _From, CurrentValue) ->
+  {reply, CurrentValue, CurrentValue + 1};
 
-handle_call({?getBody, _TVar, Transaction}, _From, VBox) ->
-  Result = getBody(VBox, Transaction),
-  {reply, Result, VBox}.
+handle_call({?increment_and_get}, _From, CurrentValue) ->
+  {reply, CurrentValue + 1, CurrentValue + 1}.
 
 handle_cast(Cast, State) ->
   utilities:unexpected(cast, Cast),
@@ -59,17 +60,6 @@ handle_info(Info, State) ->
 terminate(_, _) -> ok.
 
 code_change(_, State, _) -> {ok, State}.
-
-%%%_* Internal functions -------------------------------------------------------
-
-get(TVar, Transaction) ->
-  transaction:get_tvar_value(Transaction, TVar).
-
-set(TVar, Transaction, NewValue) ->
-  transaction:set_tvar_value(Transaction, TVar, NewValue).
-
-getBody(VBox, Transaction) ->
-  vbox:get(VBox, transaction:tx_number(Transaction)).
 
 %%%_* Emacs ====================================================================
 %%% Local Variables:

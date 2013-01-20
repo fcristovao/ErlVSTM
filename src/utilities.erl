@@ -9,6 +9,7 @@
 
 %%%_* Exports ==================================================================
 -export([ first/2
+        , unexpected/2
         ]).
 
 %%%_* Includes =================================================================
@@ -23,6 +24,9 @@ first(Pred, []) when is_function(Pred) -> throw(not_possible);
 first(Pred, List) when is_function(Pred), is_list(List) ->
   [Head | _ ] = lists:dropwhile(Pred, List),
   Head.
+
+unexpected(Type, Message) ->
+  error_logger:info_msg(" unexpected ~p ~p~n", [Type, Message]).
 
 %%%_* Emacs ====================================================================
 %%% Local Variables:

@@ -41,7 +41,7 @@ atomic(Fun) ->
 
 
 create_transaction() ->
-  transaction:new(1).
+  transaction:new(tx_counter:get()).
 
 get_current_transaction() ->
   case get(?STM_TRANSACTION_KEY) of

@@ -18,10 +18,10 @@
 %%%_* Application callbacks ====================================================
 
 start(_StartType, _StartArgs) ->
-    erlvstm_sup:start_link().
+  erlvstm_sup:start_link().
 
 stop(_State) ->
-    ok.
+  ok.
 
 %%%_* Emacs ====================================================================
 %%% Local Variables:

@@ -1,19 +1,22 @@
-%% -*- erlang-indent-level: 2 -*-
 %%%=============================================================================
-%%% @doc STM tests
-%%% @copyright 2012 Filipe Cristóvão
+%%% @doc 
+%%% @copyright 2012 Filipe Cristovao
 %%% @end
 %%%=============================================================================
 
 %%%_* Module declaration =======================================================
--module(stm_tests).
+
+-module(tx_counter).
 
 %%%_* Exports ==================================================================
--compile(export_all).
+-export([ get/0
+        , get_and_increment/0
+        , increment_and_get/0
+        ]).
 
 %%%_* Includes =================================================================
 
--include_lib("eunit/include/eunit.hrl").
+-include_lib("tx_counter_gen_server_messages.hrl").
 
 %%%_* Constants definition =====================================================
 
@@ -21,23 +24,14 @@
 
 %%%_* Code =====================================================================
 
-simple_test() ->
-  %application:start(sasl),
-  application:start(erlvstm),
+get() ->
+  gen_server:call(tx_counter_gen_server, {?get}).
 
-  TInt = tvar:new(0),
-  TBool = tvar:new(false),
-  TList = tvar:new([]),
+get_and_increment() ->
+  gen_server:call(tx_counter_gen_server, {?get_and_increment}).
 
-  stm:atomic(
-  	fun() ->
-  		tvar:set(TInt, 1)
-  	end
-  	),
-
-  ?debugFmt("~w~n", [tvar:get(TInt)]).
-
-  %tvar:set(TInt, 1).
+increment_and_get() ->
+  gen_server:call(tx_counter_gen_server, {?increment_and_get}).
 
 %%%_* Emacs ====================================================================
 %%% Local Variables:

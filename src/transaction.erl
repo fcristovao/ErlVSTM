@@ -12,6 +12,7 @@
 
 -export([ new/1
         , get_tvar_value/2
+        , set_tvar_value/3
         , tx_number/1
         , is_transaction/1
         ]).
@@ -35,12 +36,15 @@
 
 new(TxNumber) ->
   {ok, Pid} = gen_server:start(transaction_gen_server, TxNumber,[]),
-  TxNr = gen_server:call(Pid, ?getTransactionNumber),
+  TxNr = gen_server:call(Pid, {?getTransactionNumber}),
   new(TxNr, Pid). %% the gen_server call might not be needed, since
 %% basically it will have the same txnumber than the one we just sent
 
 get_tvar_value(Transaction, TVar) ->
   gen_server:call(pid(Transaction), {?getTVarValue, Transaction, TVar}).
+
+set_tvar_value(Transaction, TVar, NewValue) ->
+  gen_server:cast(pid(Transaction), {?setTVarValue, Transaction, TVar, NewValue}).
 
 %%%_* Internal functions -------------------------------------------------------
 

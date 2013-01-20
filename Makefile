@@ -10,7 +10,7 @@ GENERATED_DOC_FILES = doc/*.html doc/edoc-info doc/erlang.png doc/*.css
 # Design Docs:
 DESIGN_DOCS_DIR = doc/design
 
-.PHONY: doc clean clean-all
+.PHONY: doc clean clean-all shell
 
 all: compile doc
 
@@ -36,6 +36,9 @@ test: compile
 doc: $(REBAR)
 	@$(REBAR) doc skip_deps=true
 	cd $(DESIGN_DOCS_DIR); $(MAKE) 
+
+shell: compile
+	erl -pa ebin/
 
 clean:
 	@$(REBAR) clean
