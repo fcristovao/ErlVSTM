@@ -46,6 +46,9 @@ get_tvar_value(Transaction, TVar) ->
 set_tvar_value(Transaction, TVar, NewValue) ->
   gen_server:cast(pid(Transaction), {?setTVarValue, Transaction, TVar, NewValue}).
 
+commit(Transaction) ->
+  gen_server:call(pid(Transaction), {?commit, Transaction}).
+
 %%%_* Internal functions -------------------------------------------------------
 
 new(TxNumber, Pid) ->

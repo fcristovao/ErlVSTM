@@ -9,6 +9,7 @@
 -define(getTransactionNumber, get_transaction_number).
 -define(getTVarValue, get_tvar_value).
 -define(setTVarValue, set_tvar_value).
+-define(commit, commit).
 
 %%%_* Emacs ============================================================
 %%% Local Variables:

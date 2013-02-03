@@ -29,15 +29,17 @@
 
 atomic(Fun) ->
   %% Execute Fun in a transactional context
-  case get_current_transaction() of
-    none -> % No transaction has been started yet
-      NewTransaction = create_transaction(),
-      set_current_transaction(NewTransaction),
-      true;
-    _CurrentTransaction -> % There's already a transaction running.
-      true
-  end,
-  Fun().
+  CurrentTransaction =
+    case get_current_transaction() of
+      none -> % No transaction has been started yet
+        NewTransaction = create_transaction(),
+        set_current_transaction(NewTransaction),
+        NewTransaction;
+      CurrentTransaction -> % There's already a transaction running.
+        CurrentTransaction
+    end,
+  Fun(),
+  transaction:commit(CurrentTransaction).
 
 
 create_transaction() ->
